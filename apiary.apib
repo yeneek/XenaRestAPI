@@ -1,0 +1,189 @@
+FORMAT: 1A
+HOST: https://xena.expan.do:3444
+
+# Xena Rest Api
+
+REST API enabling manipulate key data items from within Expando Xena system. 
+
+## Actions with products on company level [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
+Get full product list for company. Optionally enter some filtering criterias.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + limit: 100 (number, optional) - sku reference. Max value 100.
+    + page: 1 (number, optional) - page number to start from
+    + FromTimeStamp: `2000-01-01T00:00:00` (string, optional) - time stamp from which shall be collected data
+
+### Get products for company ID [GET]
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found`
+        + data: null
+
+### Insert new product for company ID [PUT]
+Insert new product item.
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data: null
+        
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or product already exists`
+        + data: null
+
+## Actions with specific product [/v1/Products/{CompanyID}/{SKU}]
+Get specific product by SKU
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: 2014800111 (string, required) - SKU ID
+
+### Get product details for SKU [GET]
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Product not found`
+        + data: null
+
+### Insert or update product details for SKU [POST]
+Insert new or update existig product item based on SKU.
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data: null
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found`
+        + data: null
+
+# Data Structures
+
+## DataDefBase (object)
+
+- sku: 2014800111 (string, required) - SKU reference
+
+## OrderDef (object)
+
+- Include DataDefBase
+
+## SellerOrderDef (object)
+Defines data object carryout true marketplace
+
+- Include DataDefBase
+
+## CommonDataDef (object)
+
+- parentChild (enum[string], required)
+    - Base
+    - Parent
+    - Variant
+- updateBlocked: false (boolean, required) - indicate whether is product modifiable
+- productStatus (enum[string], required)
+    - Unknown
+    - New
+    - Active
+    - InActive
+    - Archived
+- ean: 4024144201488 (string, nullable) - EAN number
+- parentSKU (string, nullable) - reference to parent SKU. Mandatory for variants otherwise null.
+- brand: Cottelli (string, nullable) - Brand like ThinkPad, Xperia, etc.
+- manufacturer: Cottelli (string, optional) - Manufacturer like Lenovo, Sony, etc.
+- mnp (string, optional) - Manufacturer part number
+- productCategory: `Dámské erotické šaty` (string, nullable) - Defines high level category. Might be also list. Depends on destination interpretation.
+- productSubCategory (string, optional) - Defines sub-category for product like chef kniwes
+- size (string, nullable) - define size like 180, L, 43.5.
+- sizeMap (string, nullable) - define standardized size value. Based on entry size
+- color (string, nullable) - defines color like "light blue", etc. 
+- colorMap (string, nullable) - defines color from range of 16 colors pallete (aka blue)
+- variationTheme (string) - indicate variation theme. Currently supported "Size", "Color", "SizeAndColor"
+- itemCondition (enum[string], required) 
+    - Undefined
+    - New
+    - Used
+- initPrice: 0 (number, default) - product price when product definition imported
+- ccy: `CZK` (string, required) - 3 letter currency as defined in the ISO 4217
+- initQuantity: 1 (number, default) - indicate stock volume during product definition import/update.
+- taxCode (string, optional) - identify tax code like VAT21, etc.
+- productUrl: `https://www.sex-shop.cz/access18/cottelli-rybarka-sitovane-saty-s-l-d3073.htm?hrk=QPOCJKFGLDS` (string, nullable) - Reference to seller product page
+- imgUrls (array[string])
+- customData: `{"VAT":"21"}` (string, nullable) - keeps custom data in key/value format. Typically usefull for data which do not have standard field in DB but are important for given product like varies contact lenses sizes, water content, etc.
+- origData: `{"CODE":"2014800000","PRICE":"312.4","VAT":"21","DELIVERY_DATE":"0"}` (string, nullable) - keeps custom data in key/value format
+- lastUpdate: `2018-01-15T14:46:57` (string, required) - Timestamp when this record was last time updated/created.
+
+## LocalizedDataDef (object)
+
+- language(enum[string], required) - indicate language which is used for localized data
+    - NA
+    - CS
+    - EN
+    - DE
+    - ES
+    - FR
+    - IT
+    - PL
+    - RO
+    - UK
+    - HU
+    
+- suppliedBySeller: true (boolean, required) - inidicate if seller was supplier this localized data
+- translated: false (boolean) - indicate if data was translated on Xena side
+- approved: true (boolean) - indicate if language wersion is fully approved to be used on marketplace side
+- name: `Cottelli Rybárka Sítované šaty S-L` (string, required) - product title
+- description: `Skvele elastické šaty s velkými oky. Materiál: 85% Polyamid, 15% Elasthan.` (string, required) - product description
+- keywords (array[string], required) - list of keyword definitions to be registered with search engine. Up to 5 items in array. Each item can contain multiple keywords separated by comma.
+- bulletPoints (array[string], required) - list of bullet points to be shown as short description on product page. Up to 5 items in array.
+- lastUpdate: `2018-01-15T14:46:57` (string, required) - Timestamp indicating when last change of this data part was changed.
+
+## MarketplaceSetupDef (object)
+
+- Amazon: 0 (number, optional) - Indicate if on AMAZON 1 yes, 0 no
+- Ebay: 0 (number, optional) - Indicate if on AMAZON 1 yes, 0 no
+- Spartoo: 0 (number, optional) - Indicate if on Spartoo 1 yes, 0 no
+- Inspirum: 0 (number, optional) - Indicate if on Inspirum 1 yes, 0 no
+- Magento: 0 (number, optional) - Indicate if on Magento 1 yes, 0 no
+
+## MarketRegistryDataDef (object)
+
+- marketplaceSetup (MarketplaceSetupDef, optional) - list of marketplaces with values indicating if marketplace used for trading or not.
+- lastUpdate: `0001-01-01T00:00:00` (string, required) - Time stamp when record was last time modified/created.
+
+## ProductDef (object)
+
+- Include DataDefBase
+- commonData (CommonDataDef, required) - common product data section
+- localizedData (array[LocalizedDataDef], optional) - product language specific fields. For each language translation one record.
+- marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace  
+- lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
+- timeStamp: 636516244170000000 (string) - Time stannp traslated into DateTime.Ticks as defined in C#.
+
+## DataDef (object)
+
+- orders (array[OrderDef], optional) - list of orders for given filter and company ID
+- sellerOrders (array[SellerOrderDef], optional) - list of orders for given filter and company ID
+- products (array[ProductDef], optional) - list of products for given filter and companyID
+
+
+## ReturnedRestApiData (object)
+
+- result (enum[string], required) - indicate success or failuers of data collection on server side
+    - ok
+    - error
+- currentPageNum: 1 (number, default) - returns current page number
+- hasNextPage: false (boolean, default) - indicate if next page is available
+- errorDetails (string, nullable) - Holds error if result type is error
+- companyID: 16 (number, required) - Company ID
+- data (DataDef, nullable) - specific API data based on original request and URI for its call
