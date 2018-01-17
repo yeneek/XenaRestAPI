@@ -1,11 +1,13 @@
 FORMAT: 1A
 HOST: https://xena.expan.do:3444
 
-# Xena Rest Api
+# Xena Product Rest Api
 
 REST API enabling manipulate key data items from within Expando Xena system. 
 
-## Actions with products on company level [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
+## Product Management
+
+### Actions with products on company level [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
 Get full product list for company. Optionally enter some filtering criterias.
 
 + Parameters
@@ -14,18 +16,31 @@ Get full product list for company. Optionally enter some filtering criterias.
     + page: 1 (number, optional) - page number to start from
     + FromTimeStamp: `2000-01-01T00:00:00` (string, optional) - time stamp from which shall be collected data
 
-### Get products for company ID [GET]
+#### Get products for company ID [GET]
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + data
+            + products (array[ProductDef], optional)
+            
 
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+            
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found`
         + data: null
 
-### Insert new product for company ID [PUT]
+#### Insert new product for company ID [PUT]
 Insert new product item.
 
 + Response 200 (application/json)
@@ -38,14 +53,14 @@ Insert new product item.
         + errorDetails: `Company not found or product already exists`
         + data: null
 
-## Actions with specific product [/v1/Products/{CompanyID}/{SKU}]
+### Actions with specific product [/v1/Products/{CompanyID}/{SKU}]
 Get specific product by SKU
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
     + SKU: 2014800111 (string, required) - SKU ID
 
-### Get product details for SKU [GET]
+#### Get product details for SKU [GET]
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
@@ -56,7 +71,7 @@ Get specific product by SKU
         + errorDetails: `Product not found`
         + data: null
 
-### Insert or update product details for SKU [POST]
+#### Insert or update product details for SKU [POST]
 Insert new or update existig product item based on SKU.
 
 + Response 200 (application/json)
@@ -68,6 +83,8 @@ Insert new or update existig product item based on SKU.
         + result: error
         + errorDetails: `Company not found`
         + data: null
+
+### Actions with specific product [/v1/IPM/{CompanyID}]
 
 # Data Structures
 
@@ -168,13 +185,33 @@ Defines data object carryout true marketplace
 - marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace  
 - lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
-- timeStamp: 636516244170000000 (string) - Time stannp traslated into DateTime.Ticks as defined in C#.
+- timeStamp: 636516244170000000 (string, required) - Time stannp traslated into DateTime.Ticks as defined in C#.
+
+## InventoryAndPriceDef (object)
+
+- Include DataDefBase
+- marketplaceName (string, required) - marketplace reference like Amazon, Inspirum, etc.
+- quantity: 0 (number, default) - product QTY
+- priceUS (number) - price in US
+- priceUK (number) - price in UK
+- priceDE: 0.01 (number) - price in DE
+- priceFR (number) - price in FR
+- priceES (number) - price in ES
+- priceIT (number) - price in IT
+- priceHU (number) - price in HU
+- priceRO (number) - price in RO
+- pricePL (number) - price in PL
+- priceUE (number) - price in Ukraine
+- lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
+- timeStamp: 636516244170000000 (string, required) - Time stannp traslated into DateTime.Ticks as defined in C#.
 
 ## DataDef (object)
 
 - orders (array[OrderDef], optional) - list of orders for given filter and company ID
 - sellerOrders (array[SellerOrderDef], optional) - list of orders for given filter and company ID
 - products (array[ProductDef], optional) - list of products for given filter and companyID
+- inventoryDef (array[InventoryAndPriceDef], optional) - list of SKU with current inventory and prices values.
 
 
 ## ReturnedRestApiData (object)
