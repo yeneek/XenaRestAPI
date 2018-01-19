@@ -1,22 +1,39 @@
 FORMAT: 1A
 HOST: https://xena.expan.do:3444
 
-# Xena Product Rest Api
+# Xena REST Api
 
-REST API enabling manipulate key data items from within Expando Xena system. 
+Xena API enables get and manipulate key data items defined in the Expando Xena system.
+
+All REST API calls are authenticated on server side via HTTP basic authentication.
 
 ## Product Management
 
-### Actions with products on company level [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
-Get full product list for company. Optionally enter some filtering criterias.
+Product related data provides detail item description such a way it allows seller register it on different marketplaces. Some product properties are common (aka reusable over marketplaces) while part is language/marketplace specific (e.g. product title, ASIN code, etc.).
+
+Beside product description this API part provides also inventory and price data. This allows external client apps keep marketplace offers up to date.
+
+### Company level actions [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
+Call this resource enables client to get product data in lists like form. If no URI conditional parameters are used than function returns full list of products maintained in Xena system for given company in paged form.
+
+All call results are generally paged to ensure data will not exceed HTTP message capacity. Default values is set to 100 product items in one page. The ***limit*** value can be set in range from 1 to 100. Any bigger value than limit max. are set to 100, any value lower than 1 are set to 1.
+
+All product data items have TimeStamp value of long data type attached to it. This value is changed every time product item is changed somehow. It is guarantied value is monotonically increased as it is based on DateTime.Now.Ticks from C#. 
+
+If client app is state-full and it is interested with product data changes than it is more data effective if on call is used  **FromThisStamp** parameter. Client app must just find the max. value from its product repository and and put this value on param call. 
+
+Result data contains amon other two parameters ***currentPageNum*** and ***hasNextPage***. The ***currentPageNum*** contains current page number which was requested (it shall match value from GET quest) while ***hasNextPage*** indicate if there is another waiting data page.
+
+It shall be stated the page ***limit*** size shall not be changed after calling page 1 and client app start to "traverses" additional result pages.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
-    + limit: 100 (number, optional) - sku reference. Max value 100.
-    + page: 1 (number, optional) - page number to start from
-    + FromTimeStamp: `2000-01-01T00:00:00` (string, optional) - time stamp from which shall be collected data
+    + limit: 100 (number, optional) - page size. Min 1 and Max value 100.
+    + page: 1 (number, optional) - page number to start from. Value starts from 1.
+    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
 
-#### Get products for company ID [GET]
+#### Get product list for company ID [GET]
+Get list of products.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
@@ -40,20 +57,35 @@ Get full product list for company. Optionally enter some filtering criterias.
         + errorDetails: `Company not found`
         + data: null
 
-#### Insert new product for company ID [PUT]
-Insert new product item.
+#### Insert new product for company ID [POST]
+Insert new product item. If item with given SKU exists than is returned error.
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + data
+            + products (ProductBaseDef, optional)
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
         + data: null
-        
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found or product already exists`
         + data: null
 
-### Actions with specific product [/v1/Products/{CompanyID}/{SKU}]
+### SKU product actions [/v1/Products/{CompanyID}/{SKU}]
 Get specific product by SKU
 
 + Parameters
@@ -61,30 +93,173 @@ Get specific product by SKU
     + SKU: 2014800111 (string, required) - SKU ID
 
 #### Get product details for SKU [GET]
+Gets specific product details.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
 
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
-        + errorDetails: `Product not found`
+        + errorDetails: `Company or product not found.`
         + data: null
 
-#### Insert or update product details for SKU [POST]
-Insert new or update existig product item based on SKU.
+#### Insert or update product details for SKU [PUT]
+Update existing product item based on SKU.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
         + data: null
 
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
-        + errorDetails: `Company not found`
+        + errorDetails: `Company or product not found.`
         + data: null
 
-### Actions with specific product [/v1/IPM/{CompanyID}]
+### Inventory and Price Management per Company [/v1/IPM/{CompanyID}{?limit,page,FromTimeStamp}]
+Resource enables load and save inventory and price related data for specified company.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + limit: 100 (number, optional) - page reference. Min value 1 and Max value 100. Default 100.
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
+
+#### Get inventory and price data [GET]
+Get IP list.
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + inventoryDef (array[InventoryAndPriceDef], optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found.`
+        + data: null
+
+#### Insert or update product prices [POST]
+Insert new Inventory and Price data. Data in post body must contain fully defined IP data structure (aka all prices and qty) for marketplace and SKU combination.
+
++ Request (application/json)
+    + Attributes (ReturnedRestApiData)
+        + companyID: 16 (number, required) - Company ID
+        + data
+            + inventoryDef (InventoryAndPriceDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or SKU data already exists.`
+        + data: null
+
+### Inventory and Price Management per Company and SKU [/v1/IPM/{CompanyID}/{SKU}{?limit,page,FromTimeStamp}]
+Per SKU inventory and price data loading and updates.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: A66 (string, required) - Product sku
+    + limit: 100 (number, optional) - page reference. Min value 1, Max value 100. Default 100.
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
+
+#### Get inventory and price data [GET]
+Get IP for specific SKU.
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + inventoryDef (InventoryAndPriceDef, optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or SKU not found.`
+        + data: null
+
+#### Insert or update product prices [PUT]
+Enables update existing IP data for specific SKU. Update body expects full update for quantity and all price of given SKU and marketplace combination.
+
++ Request (application/json)
+    + Attributes (ReturnedRestApiData)
+        + companyID: 16 (number, required) - Company ID
+        + data
+            + inventoryDef (InventoryAndPriceDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or SKU not found.`
+        + data: null
 
 # Data Structures
 
@@ -138,7 +313,6 @@ Defines data object carryout true marketplace
 - imgUrls (array[string])
 - customData: `{"VAT":"21"}` (string, nullable) - keeps custom data in key/value format. Typically usefull for data which do not have standard field in DB but are important for given product like varies contact lenses sizes, water content, etc.
 - origData: `{"CODE":"2014800000","PRICE":"312.4","VAT":"21","DELIVERY_DATE":"0"}` (string, nullable) - keeps custom data in key/value format
-- lastUpdate: `2018-01-15T14:46:57` (string, required) - Timestamp when this record was last time updated/created.
 
 ## LocalizedDataDef (object)
 
@@ -162,7 +336,6 @@ Defines data object carryout true marketplace
 - description: `Skvele elastické šaty s velkými oky. Materiál: 85% Polyamid, 15% Elasthan.` (string, required) - product description
 - keywords (array[string], required) - list of keyword definitions to be registered with search engine. Up to 5 items in array. Each item can contain multiple keywords separated by comma.
 - bulletPoints (array[string], required) - list of bullet points to be shown as short description on product page. Up to 5 items in array.
-- lastUpdate: `2018-01-15T14:46:57` (string, required) - Timestamp indicating when last change of this data part was changed.
 
 ## MarketplaceSetupDef (object)
 
@@ -175,14 +348,17 @@ Defines data object carryout true marketplace
 ## MarketRegistryDataDef (object)
 
 - marketplaceSetup (MarketplaceSetupDef, optional) - list of marketplaces with values indicating if marketplace used for trading or not.
-- lastUpdate: `0001-01-01T00:00:00` (string, required) - Time stamp when record was last time modified/created.
 
-## ProductDef (object)
+## ProductBaseDef (object)
 
 - Include DataDefBase
 - commonData (CommonDataDef, required) - common product data section
 - localizedData (array[LocalizedDataDef], optional) - product language specific fields. For each language translation one record.
 - marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace  
+
+## ProductDef (object)
+
+- Include ProductBaseDef
 - lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
 - timeStamp: 636516244170000000 (string, required) - Time stannp traslated into DateTime.Ticks as defined in C#.
@@ -190,21 +366,27 @@ Defines data object carryout true marketplace
 ## InventoryAndPriceDef (object)
 
 - Include DataDefBase
-- marketplaceName (string, required) - marketplace reference like Amazon, Inspirum, etc.
+- marketplace (enum[string], required) - marketplace reference. 
+  - NA - Not available
+  - Amazon
+  - Spartoo
+  - Ebay
+  - Inspirum
+  - Magento
 - quantity: 0 (number, default) - product QTY
-- priceUS (number) - price in US
-- priceUK (number) - price in UK
-- priceDE: 0.01 (number) - price in DE
-- priceFR (number) - price in FR
-- priceES (number) - price in ES
-- priceIT (number) - price in IT
-- priceHU (number) - price in HU
-- priceRO (number) - price in RO
-- pricePL (number) - price in PL
-- priceUE (number) - price in Ukraine
+- priceUS (number, optional) - price for US country. Implied currency USD. 
+- priceUK (number, optional) - price for UK country. Implied currency GBP.
+- priceDE: 0.01 (number) - price for DE country. Implied currency EUR.
+- priceFR (number, optional) - price for FR country. Implied currency EUR.
+- priceES (number, optional) - price for ES country. Implied currency EUR.
+- priceIT (number, optional) - price for IT country. Implied currency EUR.
+- priceHU (number, optional) - price for HU country. Implied currency HUF.
+- priceRO (number, optional) - price for RO country. Implied currency RON.
+- pricePL (number, optional) - price for PL country. Implied currency PLZ.
+- priceUE (number, optional) - price for Ukraine country. Implied currency UAH.
 - lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
-- timeStamp: 636516244170000000 (string, required) - Time stannp traslated into DateTime.Ticks as defined in C#.
+- timeStamp: 636516244170000000 (string, required) - Time stamp translated into DateTime.Ticks as defined in C#.
 
 ## DataDef (object)
 
@@ -222,5 +404,10 @@ Defines data object carryout true marketplace
 - currentPageNum: 1 (number, default) - returns current page number
 - hasNextPage: false (boolean, default) - indicate if next page is available
 - errorDetails (string, nullable) - Holds error if result type is error
+- companyID: 16 (number, required) - Company ID
+- data (DataDef, nullable) - specific API data based on original request and URI for its call
+
+
+## ModificationRequestDef (object)
 - companyID: 16 (number, required) - Company ID
 - data (DataDef, nullable) - specific API data based on original request and URI for its call
