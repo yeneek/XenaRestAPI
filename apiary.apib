@@ -1,39 +1,249 @@
 FORMAT: 1A
 HOST: https://xena.expan.do:3444
 
-# Xena REST Api
+# Xena REST API
 
-Xena API enables get and manipulate key data items defined in the Expando Xena system.
+Xena REST API enables get and manipulate with all key data used inside Expando Xena system.
 
-All REST API calls are authenticated on server side via HTTP basic authentication.
+**Authentication**
 
-## Product Management
+All REST API calls are user authenticated on server side. For authentication is used HTTP basic authentication method. Login and password is issued for each seller company separately by Expando Agency upon request.
 
-Product related data provides detail item description such a way it allows seller register it on different marketplaces. Some product properties are common (aka reusable over marketplaces) while part is language/marketplace specific (e.g. product title, ASIN code, etc.).
+Each login and password pair is configured on Expando REST API side with allowed range of resources Typically is configured one or more company id's which given login entity can see/use. If login try to access forbidden resource than Xena API returns ***HTTP 403*** error.  
 
-Beside product description this API part provides also inventory and price data. This allows external client apps keep marketplace offers up to date.
+**Data Result paging**
 
-### Company level actions [/v1/Products/{CompanyID}{?limit,page,FromTimeStamp}]
-Call this resource enables client to get product data in lists like form. If no URI conditional parameters are used than function returns full list of products maintained in Xena system for given company in paged form.
+All `GET` call results are generally limited in size to ensure data will not exceed HTTP message data capacity. Limitation is done by configuring  max. number of biz. entities which one call can return back. System defines max. limit value to 100 items per one result call. This max. value is also default value for every `GET` call.
 
-All call results are generally paged to ensure data will not exceed HTTP message capacity. Default values is set to 100 product items in one page. The ***limit*** value can be set in range from 1 to 100. Any bigger value than limit max. are set to 100, any value lower than 1 are set to 1.
+Return result capacity can be optionally configured on `GET` call via use of ***limit*** parameter value. Parameter allowed value definition is in the range of 1 to 100. Any value above 100 are on server side reduced to 100. Any value lower than 1 are set to 1.
 
-All product data items have TimeStamp value of long data type attached to it. This value is changed every time product item is changed somehow. It is guarantied value is monotonically increased as it is based on DateTime.Now.Ticks from C#. 
+If server collects result data which exceeds in number of items `GET` call's configured max. limit via ***limit*** value than REST API send back result with maximum set limit items and indicate there is next page available. If client wants to get remaining data from server than he has to use `GET` again and specify page number for which data he wants to get.
 
-If client app is state-full and it is interested with product data changes than it is more data effective if on call is used  **FromThisStamp** parameter. Client app must just find the max. value from its product repository and and put this value on param call. 
+To support paging on result each result data delivered via HTTP contains among other parameters two parameter names supporting this: ***currentPageNum*** and ***hasNextPage***. The ***currentPageNum*** contains current page number which was returned (it shall match value from GET quest) while ***hasNextPage*** indicate by true/false if there is another waiting data page.
 
-Result data contains amon other two parameters ***currentPageNum*** and ***hasNextPage***. The ***currentPageNum*** contains current page number which was requested (it shall match value from GET quest) while ***hasNextPage*** indicate if there is another waiting data page.
+Client must check those values and if indicated next page than call GET with parameter value ***page*** set to ***currentPageNum + 1***.
 
-It shall be stated the page ***limit*** size shall not be changed after calling page 1 and client app start to "traverses" additional result pages.
+If ***page*** parameter is not set on `GET` call than REST API will use default value ***page=1*** instead.
+
+**Full Snapshot ver. Updates Only Calls**
+
+Every data entity item (for example Product item, Order item, etc.) returned by REST API has attached **timeStamp** parameter. This parameter is LONG data type value. 
+
+**timeStamp** parameter value is guarantied to be unique for each entity of same data type and particular company combination (e.g. unique for each product entity within company `A`. However uniqueness is not guarantied to be available between products of company `A` and products of company `B`. Uniqueness is not guarantied even between products and orders of same company `A`).
+
+**timeStamp** value is monotonically increased be Xena System every time entity type instance for specific seller is changed. Internally is value based on C# DateTime.Now.Ticks.    
+
+This Xena System behavior can be therefore efficiently use on client side for downloading new/updated items only since last time client called Expando REST API.
+
+Steps to apply on client side:
+Client application can use it such way it just need to look-up MAX value of ***timeStamp*** value entity type so far loaded by client. Once found the value the client assigns it to **FromThisStamp** parameter value on `GET` call. REST API server uses such value and selects all entity items with HIGHER value than defined ***timeStamp***.
+
+Default value for **FromThisStamp** is ***FromThisStamp=0***. This value is used when client first time calls REST API and does not received  any value from it.
+  
+**Date and Time Format**
+
+All date and time data are formatted according this pattern: "YYYY-MM-dd HH:mm:ss".
+
+<!-- Admin Data -->
+## Administration [/v1/Admin]
+
+Resource allows to manage Admin related data like Companies and Users. This resource hierarchy is available only for accounts flagged with ***Admin*** role. All others are rejected.
+
+### Get All companies [GET /v1/Admin/Companies{?limit,page,fromTimeStamp}]
+Get list of companies. Only admin role is allowed to read this data.
+
++ Parameters
+    + limit: 100 (number, optional) - page size. Min 1 and Max value 100.
+    + page: 1 (number, optional) - page number to start from. Value starts from 1.
+    + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + companies (array[CompanyDef], optional)
+            
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+            
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found`
+        + data: null
+
+### Insert new company item [POST /v1/Admin/Companies]
+Insert new company item. If item with given company name already exists than it is returned error.
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + companyData (CompanyDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + companyData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or product already exists`
+        + companyData: null
+
+### Update company details [PUT /v1/Admin/Companies/{CompanyID}]
+Update existing company item based on its ID. If company name matches existing for different company ID than it is update rejected.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + companyData (CompanyDef, required)
+            
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + companyData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found.`
+        + companyData: null
+
+### Get All users [GET /v1/Admin/Users{?limit,page,fromTimeStamp}]
+Get list of users. Only admin user role is allowed to read this info.
+
++ Parameters
+    + limit: 100 (number, optional) - page size. Min 1 and Max value 100.
+    + page: 1 (number, optional) - page number to start from. Value starts from 1.
+    + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + users (array[UserDef], optional)
+            
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+            
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found`
+        + data: null
+
+### Insert new user item [POST /v1/Admin/Users/{CompanyID}]
+Insert new user item. If user with given name already exists than it is returned error.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + userData (UserDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + userData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company does not exists or User name already exists`
+        + userData: null
+
+### Update user details [PUT /v1/Admin/Users/{CompanyID}/{UserID}]
+Update existing company item based on its ID. If company name matches existing for different company ID than it is update rejected.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + UserID: 51 (number, required) - user ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + userData (UserDef, required)
+            
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + userData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or User not found.`
+        + userData: null
+
+## Product Management [/v1/Products/{CompanyID}]
+
+Resource allows to manage Product related data. Data provides details like SKU, product title, description etc. which are necessary for product registration on marketplaces. Returned Product data have properties split into common data (aka reusable over marketplaces) and language/marketplace specific sections (e.g. product title, ASIN code, etc.).
+
+Beside product description this API part also provides inventory and price data. This allows external client applications keep marketplace offers up to date.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get product list for company [GET /v1/Products/{CompanyID}{?limit,page,fromTimeStamp}]
+Get list of products for specific company.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
     + limit: 100 (number, optional) - page size. Min 1 and Max value 100.
     + page: 1 (number, optional) - page number to start from. Value starts from 1.
-    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
-
-#### Get product list for company ID [GET]
-Get list of products.
+    + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
@@ -57,17 +267,16 @@ Get list of products.
         + errorDetails: `Company not found`
         + data: null
 
-#### Insert new product for company ID [POST]
-Insert new product item. If item with given SKU exists than is returned error.
+### Insert new product for company ID [POST]
+Insert new product item. If item with given SKU already exists on server side than it is returned error.
 
 + Request (application/json)
     + Attributes (ModificationRequestDef)
-        + data
-            + products (ProductBaseDef, optional)
+        + productData (ProductBaseDef, optional)
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data: null
+        + productData: null
 
 + Response 401
     + Headers
@@ -83,20 +292,18 @@ Insert new product item. If item with given SKU exists than is returned error.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found or product already exists`
-        + data: null
+        + productData: null
 
-### SKU product actions [/v1/Products/{CompanyID}/{SKU}]
-Get specific product by SKU
+### Get product details for SKU [GET /v1/Products/{CompanyID}/{SKU}]
+Gets specific product details based on sku.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
     + SKU: 2014800111 (string, required) - SKU ID
 
-#### Get product details for SKU [GET]
-Gets specific product details.
-
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + productData (ProductDef, optional)
 
 + Response 401
     + Headers
@@ -111,15 +318,23 @@ Gets specific product details.
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
-        + errorDetails: `Company or product not found.`
-        + data: null
+        + errorDetails: `Company or product SKU not found.`
+        + productData: null
 
-#### Insert or update product details for SKU [PUT]
+### Insert or update product details for SKU [PUT /v1/Products/{CompanyID}/{SKU}]
 Update existing product item based on SKU.
 
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: 2014800111 (string, required) - SKU ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + productData (ProductBaseDef, optional)
+            
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data: null
+        + productData: null
 
 + Response 401
     + Headers
@@ -134,25 +349,28 @@ Update existing product item based on SKU.
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
-        + errorDetails: `Company or product not found.`
-        + data: null
+        + errorDetails: `Company or product SKU not found.`
+        + productData: null
 
-### Inventory and Price Management per Company [/v1/IPM/{CompanyID}{?limit,page,FromTimeStamp}]
-Resource enables load and save inventory and price related data for specified company.
+## Inventory and Price Management [/v1/IPM/{CompanyID}]
+Resource enables manage inventory and price for product definitions. Listed prices are have implicit currency assigned to it. Mapping for currency is as follows: US to USD, UK to GBP, DE/FR/IT/ES/SK to EUR, CS to CZK, PL to PLZ, HU to HUF, RO to RON and UE to UAH.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get All inventory and price data [GET /v1/IPM/{CompanyID}{?limit,page,fromTimeStamp}]
+Get Quantity and Price list for given company.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
     + limit: 100 (number, optional) - page reference. Min value 1 and Max value 100. Default 100.
     + page: 1 (number, optional) - page number to start from. Default is 1.
-    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
-
-#### Get inventory and price data [GET]
-Get IP list.
+    + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
         + data
-            + inventoryDef (array[InventoryAndPriceDef], optional)
+            + inventories (array[InventoryAndPriceDef], optional)
 
 + Response 401
     + Headers
@@ -170,51 +388,17 @@ Get IP list.
         + errorDetails: `Company not found.`
         + data: null
 
-#### Insert or update product prices [POST]
-Insert new Inventory and Price data. Data in post body must contain fully defined IP data structure (aka all prices and qty) for marketplace and SKU combination.
-
-+ Request (application/json)
-    + Attributes (ReturnedRestApiData)
-        + companyID: 16 (number, required) - Company ID
-        + data
-            + inventoryDef (InventoryAndPriceDef, required)
-
-+ Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
-        + data: null
-
-+ Response 401
-    + Headers
-
-            WWW-Authenticate: Basic realm="Xena folder"
-+ Request
-    + Headers
-
-            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
-
-+ Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
-        + result: error
-        + errorDetails: `Company not found or SKU data already exists.`
-        + data: null
-
-### Inventory and Price Management per Company and SKU [/v1/IPM/{CompanyID}/{SKU}{?limit,page,FromTimeStamp}]
-Per SKU inventory and price data loading and updates.
+### Get inventory and price for specific SKU [GET /v1/IPM/{CompanyID}/{SKU}]
+Get Quantity and Price list for given company.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
-    + SKU: A66 (string, required) - Product sku
-    + limit: 100 (number, optional) - page reference. Min value 1, Max value 100. Default 100.
-    + page: 1 (number, optional) - page number to start from. Default is 1.
-    + FromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
-
-#### Get inventory and price data [GET]
-Get IP for specific SKU.
+    + SKU: 2014800111 (string, required) - SKU ID
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
         + data
-            + inventoryDef (InventoryAndPriceDef, optional)
+            + inventories (array[InventoryAndPriceDef], optional)
 
 + Response 401
     + Headers
@@ -232,18 +416,48 @@ Get IP for specific SKU.
         + errorDetails: `Company or SKU not found.`
         + data: null
 
-#### Insert or update product prices [PUT]
-Enables update existing IP data for specific SKU. Update body expects full update for quantity and all price of given SKU and marketplace combination.
+
+### Insert new product prices [POST]
+Insert new Inventory and Price data item. Data in post body must contain fully defined data structure (aka all prices and qty) for marketplace and SKU combination.
 
 + Request (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ModificationRequestDef)
         + companyID: 16 (number, required) - Company ID
-        + data
-            + inventoryDef (InventoryAndPriceDef, required)
+        + inventoryData (InventoryAndPriceDef, required)
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data: null
+        + inventoryData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or SKU data already exists.`
+        + inventoryData: null
+
+### Update inventory and price details for specific SKU [PUT /v1/IPM/{CompanyID}/{SKU}]
+Update existing inventory and price data on SKU.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: 2014800111 (string, required) - SKU ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + inventoryData (InventoryAndPriceDef, required) - Expected exactly one member
+            
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + inventoryData: null
 
 + Response 401
     + Headers
@@ -258,8 +472,199 @@ Enables update existing IP data for specific SKU. Update body expects full updat
 + Response 404 (application/json)
     + Attributes (ReturnedRestApiData)
         + result: error
-        + errorDetails: `Company not found or SKU not found.`
+        + errorDetails: `Company or product SKU not found.`
+        + inventoryData: null
+
+## Order Management [/v1/Orders/{CompanyID}]
+Retrieve marketplace related orders data. Order modifications are not supported via this API.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get All order data [GET /v1/Orders/{CompanyID}{?filter,page,fromTimeStamp}]
+Get order list based on supplied filter criteria.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + filter: Unshipped (enum[string], optional) - Refers to order types and date range for which is valid result
+        - Unshipped - This is default setup. It returns all orders with unshipped status only
+        - AllLast5Days - This returns all orders which were purchase within last 5 days and are in final state. On top of it returns all orders which are in "transient" state without date limit (aka Pending and Unshipped). 
+        - UpdatedOnly - This returns orders which were changed from the time supplied by ***fromTimeStamp***
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data. If filter defines UpdateOnly type than this parameter must be filled in. In all other filter setup is not used for `GET` command.
+    
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + orders (array[OrderDef], required)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found.`
         + data: null
+
+### Get order details for specific order [GET /v1/Orders/{CompanyID}/{MarketplaceOrderID}]
+Get marketplace order details for specific marketplace order ID.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + MarketplaceOrderID: `13241-metalshop_de` (string, required) - Marketplace order ID
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + orders (array[OrderDef], optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or Marketplace order ID not found.`
+        + data: null
+
+## Seller Order [/v1/Sellers/{CompanyID}]
+Resource enables manage Seller side order monitoring. Seller order data confirms receiving marketplace order by seller as well as track shipping and tracking number of send package.  
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get All seller order data [GET /v1/Sellers/{CompanyID}{?limit,page,fromTimeStamp}]
+Get Seller order list for given company.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + limit: 100 (number, optional) - page reference. Min value 1 and Max value 100. Default 100.
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + sellerOrders (array[SellerOrderDef], optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found.`
+        + data: null
+
+### Get seller order item details [GET /v1/Sellers/{CompanyID}/{MarketplaceOrderID}]
+Get seller order data details for given ID.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + MarketplaceOrderID: `201-4800-99111` (string, required) - Marketplace order ID
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + data
+            + sellerOrders (array[SellerOrderDef], optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or seller order based on Marketplace order ID not found.`
+        + data: null
+
+
+### Insert new seller order data [POST]
+Insert new Seller Order data item. Data in post body must contain fully defined data structure (aka reference to marketplace order id, status, etc) for marketplace place id.
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + companyID: 16 (number, required) - Company ID
+        + sellerData (SellerOrderDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + sellerData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or seller order data already exists.`
+        + sellerData: null
+
+### Update seller order details [PUT /v1/Sellers/{CompanyID}/{MarketplaceOrderID}]
+Update existing seller order data based on Marketplace Order ID.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + MarketplaceOrderID: `201-4800-99111` (string, required) - Marketplace order ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + sellerData (SellerOrderDef, required) - Expected exactly one member
+            
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + sellerData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or seller's market order id reference not found.`
+        + sellerData: null
+
 
 # Data Structures
 
@@ -267,15 +672,184 @@ Enables update existing IP data for specific SKU. Update body expects full updat
 
 - sku: 2014800111 (string, required) - SKU reference
 
+## CompanyDef (object)
+
+- id: 5 (number, required) - Internal company ID
+- name: Alensa (string, required) - Display company name
+- longName: Alensa (string, required) - Full company name
+- isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
+- language: CZ (string, required) - Language to use for business letter communication
+- email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
+- createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
+- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string, required) - Time stamp of when entity was last time modified.
+
+## UserDef (object)
+
+- companyId: 2 (number, required) - Company ID under which user belongs to.
+- id: 5 (number, required) - Internal user ID
+- name: JoeDoe (string, required) - Display user name
+- longName: `Joe R. Doe jr.` (string, required) - Full user name
+- isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
+- language: CZ (string, required) - Language to use for business letter communication
+- email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
+- createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
+- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string, required) - Time stamp of when entity was last time modified.
+
 ## OrderDef (object)
 
-- Include DataDefBase
+- orderId: `13241-metalshop_de` (string, required) - Marketplace order ID. ID format is specific to marketplace source.
+- orderStatus (enum[string], required)
+    - Unknown
+    - PendingAvailability
+    - Pending
+    - Unshipped
+    - PartiallyShipped
+    - Shipped
+    - InvoiceUnconfirmed
+    - Canceled
+    - Unfillable
+    - SellerRegistered
+    - SellerTNAssigned
+    - SellerShipped
+    - SellerCanceled
+    - Aggregated states
+    - NeedShipping
+    - NeedShippingAndPending
+    - AllAmazon
+    - Unfillable
+    - AllInternal
+    - All
+- purchaseDate: 2017-11-01 11:24:03 (string, required) Purchase date. Value in local time of marketplace.
+- marketplace: EBAY DE (string, required) - Indicate marketplace and location
+- venue: EBAY (enum[string], required) - Selling venue
+    - EBAY
+    - AMAZON
+    - INSPIRUM
+    - SPARTOO
+- fulfillmentChannel: Seller (enum[string], required) - Parameter Indicates who supply goods to buyer
+    - AMZN
+    - Seller
+    - Undefined
+- totalPrice: 28.29 (number, required) - Total order price including payment & shipping.
+- currencyCode: EUR (enum[string], required) - Parameter indicates currency of ordre price.
+    - EUR
+    - USD
+    - GBP
+    - PLZ
+    - CZK
+    - HUF
+    - RON
+    - UAH
+- language: EN (string, optional) - Indicate language of communication with marketplace. 
+- paymentMethod: Other (enum[string], required)
+    - Unknown
+    - Cash
+    - Store
+    - Other
+    - CCAccepted
+    - PayPal
+    - WireTransfer
+    - CashOnDelivery
+    - MoneyXferAcceptedInCheckout
+- paymentId: 128 (string, required)
+- paymentPrice: 0.0 (number, required) - Price charged for payment.
+- shippingMethod: DE_DHLPaket (string, required) - Shipping method indicator
+- shippingId: 127 (string, required)
+- shippingPrice: 4.90 (number, required) - Shipping price for order
+- customer (OrderCustomerDef, required)
+- items (array[OrderItemsDef], required)
+
+## OrderCustomerDef (object)
+- firstName: Autopflege (string, required)
+- surname: `Breiler c/o Conny Förster` (string, required)
+- email: conny.foerster@mail.de (string, required)
+- phone: `+42087654321` (string, required)
+- address (object, required)
+    - address1: `Alte Str. 42-44` (string, required)
+    - address2 (string, required)
+    - address3 (string, required)
+    - city: `Weil am Rhein` (string, required)
+    - zip: `79576` (string, required)
+    - stateOrRegion (string, required)
+    - country: Germany (string, required)
+
+## OrderItemsDef (object)
+
+- itemId: V251471 (string, required) - SKU of sold item. 
+- itemPrice: 23.39 (number, required) - Item price. Currency is same as listed on the order
+- itemQuantity: 1 (number, required) - Count of items sold.
+- itemName: `Herren T-Shirt Jack Daniels` (string, required) - Product title. Might be empty if not supplied by marketplace. 
+- orderItemId: 1894713206017 (string, required) - Marketplace specific item reference. Unique number for each order line. 
 
 ## SellerOrderDef (object)
-Defines data object carryout true marketplace
+Defined data object links marketplace order item with seller's order status of registering/shipping
 
-- Include DataDefBase
+- marketplaceVenue (enum[string], required)
+    - Unknown
+    - AMAZON
+    - EBAY
+    - SPARTOO
+    - INSPIRUM
+- marketplaceOrderId: 407-5855561-6234719 (string, required)
+- sellerInternalOrderId: 9001003875 (string, optional)
+- orderStatus: (enum[string], required)
+    - Undefined
+    - Registered
+    - Shipped
+    - Canceled
+    - TNUpdate
+    - ComplaintByCustomer
+- registryDatetime: "2018-01-17 06:00:28" (string, required) - Date and time of order registry on seller side. 
+- lastUpdateDatetime: "2018-01-22 14:55:00" (string, required) - Date and time of last update on seller side. 
+- shipCancelDate: "2018-01-17" (string, required) - Date when package is shipped or order cancel date. Format "yyyy-MM-dd", For registry status is shipCancelData set to "0001-01-01" 
+- cancelReason (enum[string], optional) - indicate reason for canceling data. Required only if **orderStatus=Canceled**
+    - Undefined
+    - NoInventory
+    - BuyerCanceled
+    - GeneralAdjustment
+    - PricingError
+    - ShippingAddressUndeliverable
+    - CustomerExchange
+    - NotPickedUpByCustomer
+- carrierCode: DPD (enum[string], required) Indicate shipping carrier. If not specific from list than shall one use Other option and specify **carrierName** field.
+    - BluePackage
+    - USPS
+    - UPS
+    - UPSMI
+    - FedEx
+    - DHL
+    - DHLGlobalMail
+    - Fastway
+    - UPSMailInnovations
+    - Lasership
+    - RoyalMail
+    - FedExSmartPost
+    - OSM
+    - OnTrac
+    - Streamlite
+    - Newgistics
+    - CanadaPost
+    - CityLink
+    - GLS
+    - GO
+    - HermesLogistikGruppe
+    - Parcelforce
+    - TNT
+    - Target
+    - SagawaExpress
+    - NipponExpress
+    - YamatoTransport
+    - DPD
+    - Other
+    - Unknown
+- carrierName: DPD_DE (string, required) carried name if indicated Other from **carrierCode**
+- trackingNumber: 01925025350108 (string, required) indicate package tracking code which was assigned by carrier company.
+- carrierId: 27F0B9FC58B940FE8B469EBE3C76D2D5 (string, optional) Carrier internal package ID if known. Used by JAPO only.
+- carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
 
+<!-- Product Data -->
 ## CommonDataDef (object)
 
 - parentChild (enum[string], required)
@@ -328,7 +902,6 @@ Defines data object carryout true marketplace
     - RO
     - UK
     - HU
-    
 - suppliedBySeller: true (boolean, required) - inidicate if seller was supplier this localized data
 - translated: false (boolean) - indicate if data was translated on Xena side
 - approved: true (boolean) - indicate if language wersion is fully approved to be used on marketplace side
@@ -359,9 +932,9 @@ Defines data object carryout true marketplace
 ## ProductDef (object)
 
 - Include ProductBaseDef
-- lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
-- timeStamp: 636516244170000000 (string, required) - Time stannp traslated into DateTime.Ticks as defined in C#.
+- lastChanged: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- key: 2014800000 (string, required) - unified key under which product def is uniquely sorted.
+- timeStamp: 636516244170000000 (string, required) - Time stamp translated into DateTime.Ticks as defined in C#.
 
 ## InventoryAndPriceDef (object)
 
@@ -384,16 +957,18 @@ Defines data object carryout true marketplace
 - priceRO (number, optional) - price for RO country. Implied currency RON.
 - pricePL (number, optional) - price for PL country. Implied currency PLZ.
 - priceUE (number, optional) - price for Ukraine country. Implied currency UAH.
-- lastChanged: `2018-01-15T14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- key: 2014800000 (string, required) - unified key under which product def is uniquelly sorted.
+- lastChanged: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- key: 2014800000 (string, required) - unified key under which product def is uniquely sorted.
 - timeStamp: 636516244170000000 (string, required) - Time stamp translated into DateTime.Ticks as defined in C#.
 
 ## DataDef (object)
 
+- companies (array[CompanyDef], optional) - list of companies
+- users (array[UserDef], optional) - list of users
 - orders (array[OrderDef], optional) - list of orders for given filter and company ID
-- sellerOrders (array[SellerOrderDef], optional) - list of orders for given filter and company ID
+- sellerOrders (array[SellerOrderDef], optional) - list of seller orders for given filter and company ID
 - products (array[ProductDef], optional) - list of products for given filter and companyID
-- inventoryDef (array[InventoryAndPriceDef], optional) - list of SKU with current inventory and prices values.
+- inventories (array[InventoryAndPriceDef], optional) - list of SKU with current inventory and prices values.
 
 
 ## ReturnedRestApiData (object)
