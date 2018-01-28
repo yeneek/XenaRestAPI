@@ -59,8 +59,7 @@ Get list of companies. Only admin role is allowed to read this data.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + companies (array[CompanyDef], optional)
+        + companies (array[CompanyDef], optional)
             
 
 + Response 401
@@ -77,7 +76,7 @@ Get list of companies. Only admin role is allowed to read this data.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found`
-        + data: null
+        + companies: null
 
 ### Insert new company item [POST /v1/Admin/Companies]
 Insert new company item. If item with given company name already exists than it is returned error.
@@ -88,7 +87,7 @@ Insert new company item. If item with given company name already exists than it 
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + companyData: null
+        + companyData (CompanyDef, required) - company data definition including assigned ID
 
 + Response 401
     + Headers
@@ -146,8 +145,7 @@ Get list of users. Only admin user role is allowed to read this info.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + users (array[UserDef], optional)
+        + users (array[UserDef], optional)
             
 
 + Response 401
@@ -164,7 +162,7 @@ Get list of users. Only admin user role is allowed to read this info.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found`
-        + data: null
+        + users: null
 
 ### Insert new user item [POST /v1/Admin/Users/{CompanyID}]
 Insert new user item. If user with given name already exists than it is returned error.
@@ -178,7 +176,7 @@ Insert new user item. If user with given name already exists than it is returned
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + userData: null
+        + userData (UserDef, required) - accepted user data with assigned user id
 
 + Response 401
     + Headers
@@ -236,7 +234,7 @@ Beside product description this API part also provides inventory and price data.
 + Parameters
     + CompanyID: 123 (number, required) - company ID
 
-### Get product list for company [GET /v1/Products/{CompanyID}{?limit,page,fromTimeStamp}]
+### Get All products for company [GET /v1/Products/{CompanyID}{?limit,page,fromTimeStamp}]
 Get list of products for specific company.
 
 + Parameters
@@ -247,8 +245,7 @@ Get list of products for specific company.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + products (array[ProductDef], optional)
+        + products (array[ProductDef], optional)
             
 
 + Response 401
@@ -265,18 +262,18 @@ Get list of products for specific company.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found`
-        + data: null
+        + products: null
 
-### Insert new product for company ID [POST]
+### Add new product [POST]
 Insert new product item. If item with given SKU already exists on server side than it is returned error.
 
 + Request (application/json)
     + Attributes (ModificationRequestDef)
-        + productData (ProductBaseDef, optional)
+        + productData (ProductBaseDef, required)
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + productData: null
+        + productData (ProductBaseDef, required) - returns product data with assigned product ID
 
 + Response 401
     + Headers
@@ -321,7 +318,7 @@ Gets specific product details based on sku.
         + errorDetails: `Company or product SKU not found.`
         + productData: null
 
-### Insert or update product details for SKU [PUT /v1/Products/{CompanyID}/{SKU}]
+### Update product details [PUT /v1/Products/{CompanyID}/{SKU}]
 Update existing product item based on SKU.
 
 + Parameters
@@ -369,8 +366,7 @@ Get Quantity and Price list for given company.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + inventories (array[InventoryAndPriceDef], optional)
+        + inventories (array[InventoryAndPriceDef], optional)
 
 + Response 401
     + Headers
@@ -386,7 +382,7 @@ Get Quantity and Price list for given company.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found.`
-        + data: null
+        + inventories: null
 
 ### Get inventory and price for specific SKU [GET /v1/IPM/{CompanyID}/{SKU}]
 Get Quantity and Price list for given company.
@@ -397,8 +393,7 @@ Get Quantity and Price list for given company.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + inventories (array[InventoryAndPriceDef], optional)
+        + inventories (array[InventoryAndPriceDef], optional)
 
 + Response 401
     + Headers
@@ -414,7 +409,7 @@ Get Quantity and Price list for given company.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company or SKU not found.`
-        + data: null
+        + inventories: null
 
 
 ### Insert new product prices [POST]
@@ -427,7 +422,7 @@ Insert new Inventory and Price data item. Data in post body must contain fully d
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + inventoryData: null
+        + inventoryData (InventoryAndPriceDef, required) - returns accepted data
 
 + Response 401
     + Headers
@@ -495,8 +490,7 @@ Get order list based on supplied filter criteria.
     
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + orders (array[OrderDef], required)
+        + orders (array[OrderDef], required)
 
 + Response 401
     + Headers
@@ -512,7 +506,7 @@ Get order list based on supplied filter criteria.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found.`
-        + data: null
+        + orders: null
 
 ### Get order details for specific order [GET /v1/Orders/{CompanyID}/{MarketplaceOrderID}]
 Get marketplace order details for specific marketplace order ID.
@@ -523,8 +517,7 @@ Get marketplace order details for specific marketplace order ID.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + orders (array[OrderDef], optional)
+        + orderData (OrderDef, optional)
 
 + Response 401
     + Headers
@@ -540,7 +533,7 @@ Get marketplace order details for specific marketplace order ID.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company or Marketplace order ID not found.`
-        + data: null
+        + orderData: null
 
 ## Seller Order Management [/v1/Sellers/{CompanyID}]
 Resource enables manage Seller side order monitoring. Seller order data confirms receiving marketplace order by seller as well as track shipping and tracking number of send package.  
@@ -559,8 +552,7 @@ Get Seller order list for given company.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + sellerOrders (array[SellerOrderDef], optional)
+        + sellerOrders (array[SellerOrderDef], required)
 
 + Response 401
     + Headers
@@ -576,7 +568,7 @@ Get Seller order list for given company.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company not found.`
-        + data: null
+        + sellerOrders: null
 
 ### Get seller order item details [GET /v1/Sellers/{CompanyID}/{MarketplaceOrderID}]
 Get seller order data details for given ID.
@@ -587,8 +579,7 @@ Get seller order data details for given ID.
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + data
-            + sellerOrders (array[SellerOrderDef], optional)
+        + sellerData (SellerOrderDef, required)
 
 + Response 401
     + Headers
@@ -604,7 +595,7 @@ Get seller order data details for given ID.
     + Attributes (ReturnedRestApiData)
         + result: error
         + errorDetails: `Company or seller order based on Marketplace order ID not found.`
-        + data: null
+        + sellerData: null
 
 
 ### Insert new seller order data [POST]
@@ -617,7 +608,7 @@ Insert new Seller Order data item. Data in post body must contain fully defined 
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
-        + sellerData: null
+        + sellerData (SellerOrderDef, required) - returned seller order data with assigned id
 
 + Response 401
     + Headers
@@ -721,7 +712,7 @@ Update existing seller order data based on Marketplace Order ID.
     - Unfillable
     - AllInternal
     - All
-- purchaseDate: 2017-11-01 11:24:03 (string, required) Purchase date. Value in local time of marketplace.
+- purchaseDate: `2017-11-01 11:24:03` (string, required) Purchase date. Value in local time of marketplace.
 - marketplace: EBAY DE (string, required) - Indicate marketplace and location
 - venue: EBAY (enum[string], required) - Selling venue
     - EBAY
@@ -764,7 +755,7 @@ Update existing seller order data based on Marketplace Order ID.
 ## OrderCustomerDef (object)
 - firstName: Autopflege (string, required)
 - surname: `Breiler c/o Conny Förster` (string, required)
-- email: conny.foerster@mail.de (string, required)
+- email: `conny.foerster@mail.de` (string, required)
 - phone: `+42087654321` (string, required)
 - address (object, required)
     - address1: `Alte Str. 42-44` (string, required)
@@ -784,7 +775,6 @@ Update existing seller order data based on Marketplace Order ID.
 - orderItemId: 1894713206017 (string, required) - Marketplace specific item reference. Unique number for each order line. 
 
 ## SellerOrderDef (object)
-Defined data object links marketplace order item with seller's order status of registering/shipping
 
 - marketplaceVenue (enum[string], required)
     - Unknown
@@ -792,18 +782,18 @@ Defined data object links marketplace order item with seller's order status of r
     - EBAY
     - SPARTOO
     - INSPIRUM
-- marketplaceOrderId: 407-5855561-6234719 (string, required)
+- marketplaceOrderId: `407-5855561-6234719` (string, required)
 - sellerInternalOrderId: 9001003875 (string, optional)
-- orderStatus: (enum[string], required)
+- orderStatus: Registered (enum[string], required)
     - Undefined
     - Registered
     - Shipped
     - Canceled
     - TNUpdate
     - ComplaintByCustomer
-- registryDatetime: "2018-01-17 06:00:28" (string, required) - Date and time of order registry on seller side. 
-- lastUpdateDatetime: "2018-01-22 14:55:00" (string, required) - Date and time of last update on seller side. 
-- shipCancelDate: "2018-01-17" (string, required) - Date when package is shipped or order cancel date. Format "yyyy-MM-dd", For registry status is shipCancelData set to "0001-01-01" 
+- registryDatetime: `2018-01-17 06:00:28` (string, required) - Date and time of order registry on seller side. 
+- lastUpdateDatetime: `2018-01-22 14:55:00` (string, required) - Date and time of last update on seller side. 
+- shipCancelDate: `2018-01-17` (string, required) - Date when package is shipped or order cancel date. Format "yyyy-MM-dd", For registry status is shipCancelData set to `0001-01-01` 
 - cancelReason (enum[string], optional) - indicate reason for canceling data. Required only if **orderStatus=Canceled**
     - Undefined
     - NoInventory
@@ -849,7 +839,6 @@ Defined data object links marketplace order item with seller's order status of r
 - carrierId: 27F0B9FC58B940FE8B469EBE3C76D2D5 (string, optional) Carrier internal package ID if known. Used by JAPO only.
 - carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
 
-<!-- Product Data -->
 ## CommonDataDef (object)
 
 - parentChild (enum[string], required)
@@ -980,9 +969,7 @@ Defined data object links marketplace order item with seller's order status of r
 - hasNextPage: false (boolean, default) - indicate if next page is available
 - errorDetails (string, nullable) - Holds error if result type is error
 - companyID: 16 (number, required) - Company ID
-- data (DataDef, nullable) - specific API data based on original request and URI for its call
 
 
 ## ModificationRequestDef (object)
 - companyID: 16 (number, required) - Company ID
-- data (DataDef, nullable) - specific API data based on original request and URI for its call
