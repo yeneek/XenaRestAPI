@@ -117,6 +117,7 @@ Update existing company item based on its ID. If company name matches existing f
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + companyData: null
 
 + Response 401
@@ -207,6 +208,7 @@ Update existing company item based on its ID. If company name matches existing f
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + userData: null
 
 + Response 401
@@ -331,6 +333,7 @@ Update existing product item based on SKU.
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + productData: null
 
 + Response 401
@@ -452,6 +455,7 @@ Update existing inventory and price data on SKU.
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + inventoryData: null
 
 + Response 401
@@ -638,6 +642,7 @@ Update existing seller order data based on Marketplace Order ID.
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + sellerData: null
 
 + Response 401
@@ -656,7 +661,6 @@ Update existing seller order data based on Marketplace Order ID.
         + errorDetails: `Company or seller's market order id reference not found.`
         + sellerData: null
 
-
 # Data Structures
 
 ## DataDefBase (object)
@@ -673,20 +677,42 @@ Update existing seller order data based on Marketplace Order ID.
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
 - lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- timeStamp: 636516244170000000 (string, required) - Time stamp of when entity was last time modified.
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## UserDef (object)
 
 - companyId: 2 (number, required) - Company ID under which user belongs to.
 - id: 5 (number, required) - Internal user ID
-- name: JoeDoe (string, required) - Display user name
-- longName: `Joe R. Doe jr.` (string, required) - Full user name
+- name: Joe (string, required) - First user name
+- surname: `Doe jr.` (string, required) - Family user name
 - isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
 - language: CZ (string, required) - Language to use for business letter communication
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
+- password: `aXrd&6GB78s` (string, required) - User password.
+- accessRights (RoleDef, required) - Access rights
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
 - lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- timeStamp: 636516244170000000 (string, required) - Time stamp of when entity was last time modified.
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+
+## RoleDef (object)
+
+- role: SysAdmin (enum[string], required)
+    - Undefined - not able do anything
+    - SysAdmin - can do everything (e.g. create companies, users, list/modify biz. data). This user must be from company system which has value 0. Role has access allowed everywhere and to all companies. No access rights defined below limits it.
+    - CompanyAdmin - can do company related data management (e.g. create users and list modify data for associated companies) 
+    - Client - can do listing and modification biz. data
+- productRights (AccessRightsDef, required) - access rights for products
+- inventoryRights (AccessRightsDef, required) - access rights for products
+- ordersRights (AccessRightsDef, required) - access rights for products
+- sellerDataRights (AccessRightsDef, required) - access rights for products
+- xenaDashboard (AccessRightsDef, required) - access rights for products
+
+## AccessRightsDef (object)
+
+- accessType: ReadOnly (enum[string], required)
+    - NoAccess
+    - ReadOnly 
+    - ReadWrite
 
 ## OrderDef (object)
 
@@ -751,6 +777,7 @@ Update existing seller order data based on Marketplace Order ID.
 - shippingPrice: 4.90 (number, required) - Shipping price for order
 - customer (OrderCustomerDef, required)
 - items (array[OrderItemsDef], required)
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## OrderCustomerDef (object)
 - firstName: Autopflege (string, required)
@@ -838,6 +865,7 @@ Update existing seller order data based on Marketplace Order ID.
 - trackingNumber: 01925025350108 (string, required) indicate package tracking code which was assigned by carrier company.
 - carrierId: 27F0B9FC58B940FE8B469EBE3C76D2D5 (string, optional) Carrier internal package ID if known. Used by JAPO only.
 - carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## CommonDataDef (object)
 
@@ -916,7 +944,8 @@ Update existing seller order data based on Marketplace Order ID.
 - Include DataDefBase
 - commonData (CommonDataDef, required) - common product data section
 - localizedData (array[LocalizedDataDef], optional) - product language specific fields. For each language translation one record.
-- marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace  
+- marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## ProductDef (object)
 
@@ -948,7 +977,7 @@ Update existing seller order data based on Marketplace Order ID.
 - priceUE (number, optional) - price for Ukraine country. Implied currency UAH.
 - lastChanged: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquely sorted.
-- timeStamp: 636516244170000000 (string, required) - Time stamp translated into DateTime.Ticks as defined in C#.
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## DataDef (object)
 
