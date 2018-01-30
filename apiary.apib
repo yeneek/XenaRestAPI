@@ -863,6 +863,7 @@ Update existing seller order data based on Marketplace Order ID.
     - Unknown
 - carrierName: DPD_DE (string, required) carried name if indicated Other from **carrierCode**
 - trackingNumber: 01925025350108 (string, required) indicate package tracking code which was assigned by carrier company.
+- items: 02747069305011 (array[string], required) - list of order items which shall be shipped. They all expect same shipping and tracking number.
 - carrierId: 27F0B9FC58B940FE8B469EBE3C76D2D5 (string, optional) Carrier internal package ID if known. Used by JAPO only.
 - carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
 - timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
