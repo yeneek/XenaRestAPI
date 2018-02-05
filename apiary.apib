@@ -474,6 +474,128 @@ Update existing inventory and price data on SKU.
         + errorDetails: `Company or product SKU not found.`
         + inventoryData: null
 
+## Data Localization Management [/v1/Localization/{CompanyID}]
+Enables define which SKU are localized and to which language.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get All localization definition data [GET /v1/Localization/{CompanyID}{?limit,page,fromTimeStamp}]
+Get localization mappings for given company.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + limit: 100 (number, optional) - page reference. Min value 1 and Max value 100. Default 100.
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + localization (array[LocalizationDef], required)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found.`
+        + localization: null
+
+### Get localization definition item details [GET /v1/Localization/{CompanyID}/{SKU}]
+Get localization mappings for given SKU.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: `Nike_Air_2018` (string, required) - Product SKU
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + localization (array[LocalizationDef], required)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or SKU not found.`
+        + localization: null
+
+
+### Insert new localization mapping [POST]
+Insert new localization data mapping for SKU. Data in post body must contain fully defined mapping.
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + companyID: 16 (number, required) - Company ID
+        + localizedData (LocalizationDef, required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + localizedData (LocalizationDef, required) - returned localized data stored in system
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company not found or SKU localized definition already exists.`
+        + localizedData: null
+
+### Update localization mapping details [PUT /v1/Localization/{CompanyID}/{SKU}]
+Update existing localization mapping data for specific on SKU reference.
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + SKU: `Avx2341` (string, required) - Product SKU ID
+
++ Request (application/json)
+    + Attributes (ModificationRequestDef)
+        + localizedData (LocalizationDef, required) - Expected exactly one member
+            
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+        + localizedData: null
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiData)
+        + result: error
+        + errorDetails: `Company or SKU id reference not found.`
+        + localizedData: null
+
 ## Order Management [/v1/Orders/{CompanyID}]
 Retrieve marketplace related orders data. Order modifications are not supported via this API.
 
@@ -713,6 +835,36 @@ Update existing seller order data based on Marketplace Order ID.
     - NoAccess
     - ReadOnly 
     - ReadWrite
+
+## LocalizationDef (object)
+
+- Include DataDefBase
+- sourceLanguage: CS (enum[string], required) - source language
+    - CS
+    - EN
+    - DE
+    - ES
+    - FR
+    - IT
+    - RO
+    - BG
+    - HU
+    - PL
+- destinationLanguage: EN (enum[string], required) - destination language
+    - CS
+    - EN
+    - DE
+    - ES
+    - FR
+    - IT
+    - RO
+    - BG
+    - HU
+    - PL
+- enabled: true (boolean, required) - enabled
+- createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
+- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
 ## OrderDef (object)
 
