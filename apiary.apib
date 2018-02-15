@@ -58,7 +58,7 @@ Get list of companies. Only admin role is allowed to read this data.
     + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + companies (array[CompanyDef], optional)
             
 
@@ -73,7 +73,7 @@ Get list of companies. Only admin role is allowed to read this data.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
             
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found`
         + companies: null
@@ -901,6 +901,7 @@ Update existing seller order data based on Marketplace Order ID.
     - AMZN
     - Seller
     - Undefined
+- businessOrder: true (boolean, required) - Indicate if order is placed by company. If end client than set to false. 
 - totalPrice: 28.29 (number, required) - Total order price including payment & shipping.
 - currencyCode: EUR (enum[string], required) - Parameter indicates currency of ordre price.
     - EUR
@@ -1136,7 +1137,7 @@ Update existing seller order data based on Marketplace Order ID.
 - inventories (array[InventoryAndPriceDef], optional) - list of SKU with current inventory and prices values.
 
 
-## ReturnedRestApiData (object)
+## ReturnedRestApiDataBase (object)
 
 - result (enum[string], required) - indicate success or failuers of data collection on server side
     - ok
@@ -1144,6 +1145,11 @@ Update existing seller order data based on Marketplace Order ID.
 - currentPageNum: 1 (number, default) - returns current page number
 - hasNextPage: false (boolean, default) - indicate if next page is available
 - errorDetails (string, nullable) - Holds error if result type is error
+
+
+## ReturnedRestApiData (object)
+
+- Include ReturnedRestApiDataBase
 - companyID: 16 (number, required) - Company ID
 
 
