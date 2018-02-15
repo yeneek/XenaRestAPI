@@ -271,7 +271,7 @@ Insert new product item. If item with given SKU already exists on server side th
 
 + Request (application/json)
     + Attributes (ModificationRequestDef)
-        + productData (ProductBaseDef, required)
+        + productData (ProductNoRegistryDataBaseDef, required)
 
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
@@ -323,13 +323,13 @@ Gets specific product details based on sku.
 ### Update product details [PUT /v1/Products/{CompanyID}/{SKU}]
 Update existing product item based on SKU.
 
-+ Parameters
++ ParametersF
     + CompanyID: 123 (number, required) - company ID
     + SKU: 2014800111 (string, required) - SKU ID
 
 + Request (application/json)
     + Attributes (ModificationRequestDef)
-        + productData (ProductBaseDef, optional)
+        + productData (ProductNoRegistryDataBaseDef, optional)
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiData)
@@ -1087,13 +1087,17 @@ Update existing seller order data based on Marketplace Order ID.
 
 - marketplaceSetup (MarketplaceSetupDef, optional) - list of marketplaces with values indicating if marketplace used for trading or not.
 
-## ProductBaseDef (object)
+## ProductNoRegistryDataBaseDef (object)
 
 - Include DataDefBase
 - commonData (CommonDataDef, required) - common product data section
 - localizedData (array[LocalizedDataDef], optional) - product language specific fields. For each language translation one record.
-- marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace
 - timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+
+## ProductBaseDef (object)
+
+- Include ProductNoRegistryDataBaseDef
+- marketRegistryData (MarketRegistryDataDef, optional) - holds info about product presented on marketplace
 
 ## ProductDef (object)
 
