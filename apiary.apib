@@ -795,7 +795,19 @@ Update existing seller order data based on Marketplace Order ID.
 - name: Alensa (string, required) - Display company name
 - longName: Alensa (string, required) - Full company name
 - isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
-- language: CZ (string, required) - Language to use for business letter communication
+- language: CS (enum[string], required) - Language to use for business letter communication
+    - NA
+    - CS
+    - EN
+    - DE
+    - ES
+    - FR
+    - IT
+    - RO
+    - BG
+    - HU
+    - PL
+    - UK
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
 - lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
@@ -808,7 +820,19 @@ Update existing seller order data based on Marketplace Order ID.
 - name: Joe (string, required) - First user name
 - surname: `Doe jr.` (string, required) - Family user name
 - isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
-- language: CZ (string, required) - Language to use for business letter communication
+- language: CS (enum[string], required) - Language to use for business letter communication
+    - NA
+    - CS
+    - EN
+    - DE
+    - ES
+    - FR
+    - IT
+    - RO
+    - BG
+    - HU
+    - PL
+    - UK
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
 - password: `aXrd&6GB78s` (string, required) - User password.
 - accessRights (RoleDef, required) - Access rights
@@ -840,6 +864,7 @@ Update existing seller order data based on Marketplace Order ID.
 
 - Include DataDefBase
 - sourceLanguage: CS (enum[string], required) - source language
+    - NA
     - CS
     - EN
     - DE
@@ -851,6 +876,7 @@ Update existing seller order data based on Marketplace Order ID.
     - HU
     - PL
 - destinationLanguage: EN (enum[string], required) - destination language
+    - NA
     - CS
     - EN
     - DE
