@@ -82,11 +82,11 @@ Get list of companies. Only admin role is allowed to read this data.
 Insert new company item. If item with given company name already exists than it is returned error.
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + companyData (CompanyDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + companyData (CompanyDef, required) - company data definition including assigned ID
 
 + Response 401
@@ -112,11 +112,11 @@ Update existing company item based on its ID. If company name matches existing f
     + CompanyID: 123 (number, required) - company ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + companyData (CompanyDef, required)
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + companyData: null
 
@@ -131,7 +131,7 @@ Update existing company item based on its ID. If company name matches existing f
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found.`
         + companyData: null
@@ -145,7 +145,7 @@ Get list of users. Only admin user role is allowed to read this info.
     + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + users (array[UserDef], optional)
             
 
@@ -160,7 +160,7 @@ Get list of users. Only admin user role is allowed to read this info.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
             
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found`
         + users: null
@@ -172,11 +172,11 @@ Insert new user item. If user with given name already exists than it is returned
     + CompanyID: 123 (number, required) - company ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + userData (UserDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + userData (UserDef, required) - accepted user data with assigned user id
 
 + Response 401
@@ -190,7 +190,7 @@ Insert new user item. If user with given name already exists than it is returned
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company does not exists or User name already exists`
         + userData: null
@@ -203,11 +203,11 @@ Update existing company item based on its ID. If company name matches existing f
     + UserID: 51 (number, required) - user ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + userData (UserDef, required)
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + userData: null
 
@@ -222,7 +222,7 @@ Update existing company item based on its ID. If company name matches existing f
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or User not found.`
         + userData: null
@@ -246,7 +246,7 @@ Get list of products for specific company.
     + fromTimeStamp: `636516244170000000` (long, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + products (array[ProductDef], optional)
             
 
@@ -261,7 +261,7 @@ Get list of products for specific company.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
             
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found`
         + products: null
@@ -270,11 +270,11 @@ Get list of products for specific company.
 Insert new product item. If item with given SKU already exists on server side than it is returned error.
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + productData (ProductNoRegistryDataBaseDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + productData (ProductBaseDef, required) - returns product data with assigned product ID
 
 + Response 401
@@ -288,7 +288,7 @@ Insert new product item. If item with given SKU already exists on server side th
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found or product already exists`
         + productData: null
@@ -301,7 +301,7 @@ Gets specific product details based on sku.
     + SKU: 2014800111 (string, required) - SKU ID
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + productData (ProductDef, optional)
 
 + Response 401
@@ -315,7 +315,7 @@ Gets specific product details based on sku.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or product SKU not found.`
         + productData: null
@@ -328,11 +328,11 @@ Update existing product item based on SKU.
     + SKU: 2014800111 (string, required) - SKU ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + productData (ProductNoRegistryDataBaseDef, optional)
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + productData: null
 
@@ -347,7 +347,7 @@ Update existing product item based on SKU.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or product SKU not found.`
         + productData: null
@@ -368,7 +368,7 @@ Get Quantity and Price list for given company.
     + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + inventories (array[InventoryAndPriceDef], optional)
 
 + Response 401
@@ -382,7 +382,7 @@ Get Quantity and Price list for given company.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found.`
         + inventories: null
@@ -395,7 +395,7 @@ Get Quantity and Price list for given company.
     + SKU: 2014800111 (string, required) - SKU ID
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + inventoryData (InventoryAndPriceDef, required) - returns accepted data
 
 + Response 401
@@ -409,7 +409,7 @@ Get Quantity and Price list for given company.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or SKU not found.`
         + inventories: null
@@ -419,12 +419,11 @@ Get Quantity and Price list for given company.
 Insert new Inventory and Price data item. Data in post body must contain fully defined data structure (aka all prices and qty) for marketplace and SKU combination.
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
-        + companyID: 16 (number, required) - Company ID
+    + Attributes
         + inventoryData (InventoryAndPriceDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + inventoryData (InventoryAndPriceDef, required) - returns accepted data
 
 + Response 401
@@ -437,7 +436,7 @@ Insert new Inventory and Price data item. Data in post body must contain fully d
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found or SKU data already exists.`
         + inventoryData: null
@@ -450,11 +449,11 @@ Update existing inventory and price data on SKU.
     + SKU: 2014800111 (string, required) - SKU ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + inventoryData (InventoryAndPriceDef, required) - Expected exactly one member
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + inventoryData: null
 
@@ -469,7 +468,7 @@ Update existing inventory and price data on SKU.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or product SKU not found.`
         + inventoryData: null
@@ -490,7 +489,7 @@ Get localization mappings for given company.
     + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + localization (array[LocalizationDef], required)
 
 + Response 401
@@ -504,7 +503,7 @@ Get localization mappings for given company.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found.`
         + localization: null
@@ -517,7 +516,7 @@ Get localization mappings for given SKU.
     + SKU: `Nike_Air_2018` (string, required) - Product SKU
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + localization (array[LocalizationDef], required)
 
 + Response 401
@@ -531,7 +530,7 @@ Get localization mappings for given SKU.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or SKU not found.`
         + localization: null
@@ -541,12 +540,11 @@ Get localization mappings for given SKU.
 Insert new localization data mapping for SKU. Data in post body must contain fully defined mapping.
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
-        + companyID: 16 (number, required) - Company ID
+    + Attributes
         + localizedData (LocalizationDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + localizedData (LocalizationDef, required) - returned localized data stored in system
 
 + Response 401
@@ -559,7 +557,7 @@ Insert new localization data mapping for SKU. Data in post body must contain ful
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found or SKU localized definition already exists.`
         + localizedData: null
@@ -572,11 +570,11 @@ Update existing localization mapping data for specific on SKU reference.
     + SKU: `Avx2341` (string, required) - Product SKU ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + localizedData (LocalizationDef, required) - Expected exactly one member
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + localizedData: null
 
@@ -591,7 +589,7 @@ Update existing localization mapping data for specific on SKU reference.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or SKU id reference not found.`
         + localizedData: null
@@ -615,7 +613,7 @@ Get order list based on supplied filter criteria.
     + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data. If filter defines UpdateOnly type than this parameter must be filled in. In all other filter setup is not used for `GET` command.
     
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + orders (array[OrderDef], required)
 
 + Response 401
@@ -629,12 +627,12 @@ Get order list based on supplied filter criteria.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found.`
         + orders: null
 
-### Get order details for specific order [GET /v1/Orders/{CompanyID}/{MarketplaceOrderID}]
+### Get order details for specific marketplace order [GET /v1/Orders/{CompanyID}/{MarketplaceOrderID}]
 Get marketplace order details for specific marketplace order ID.
 
 + Parameters
@@ -642,7 +640,7 @@ Get marketplace order details for specific marketplace order ID.
     + MarketplaceOrderID: `13241-metalshop_de` (string, required) - Marketplace order ID
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + orderData (OrderDef, optional)
 
 + Response 401
@@ -656,7 +654,7 @@ Get marketplace order details for specific marketplace order ID.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or Marketplace order ID not found.`
         + orderData: null
@@ -677,7 +675,7 @@ Get Seller order list for given company.
     + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + sellerOrders (array[SellerOrderDef], required)
 
 + Response 401
@@ -691,7 +689,7 @@ Get Seller order list for given company.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found.`
         + sellerOrders: null
@@ -704,7 +702,7 @@ Get seller order data details for given ID.
     + MarketplaceOrderID: `201-4800-99111` (string, required) - Marketplace order ID
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + sellerData (SellerOrderDef, required)
 
 + Response 401
@@ -718,7 +716,7 @@ Get seller order data details for given ID.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or seller order based on Marketplace order ID not found.`
         + sellerData: null
@@ -728,12 +726,11 @@ Get seller order data details for given ID.
 Insert new Seller Order data item. Data in post body must contain fully defined data structure (aka reference to marketplace order id, status, etc) for marketplace place id.
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
-        + companyID: 16 (number, required) - Company ID
+    + Attributes
         + sellerData (SellerOrderDef, required)
 
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + sellerData (SellerOrderDef, required) - returned seller order data with assigned id
 
 + Response 401
@@ -746,7 +743,7 @@ Insert new Seller Order data item. Data in post body must contain fully defined 
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company not found or seller order data already exists.`
         + sellerData: null
@@ -759,11 +756,11 @@ Update existing seller order data based on Marketplace Order ID.
     + MarketplaceOrderID: `201-4800-99111` (string, required) - Marketplace order ID
 
 + Request (application/json)
-    + Attributes (ModificationRequestDef)
+    + Attributes
         + sellerData (SellerOrderDef, required) - Expected exactly one member
             
 + Response 200 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
         + sellerData: null
 
@@ -778,7 +775,7 @@ Update existing seller order data based on Marketplace Order ID.
             Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
 
 + Response 404 (application/json)
-    + Attributes (ReturnedRestApiData)
+    + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or seller's market order id reference not found.`
         + sellerData: null
