@@ -786,6 +786,20 @@ Update existing seller order data based on Marketplace Order ID.
 
 - sku: 2014800111 (string, required) - SKU reference
 
+## AmazonCompanyAuthorization (object)
+- sellerId (string, required)
+- authorizedDeveloperId (string, required)
+- mwsAuthToken (string, required)
+
+## ShopifyCompanyAuthorization (object)
+- shop (string, required)
+- accessToken (string, required)
+
+## CompanyAuthorizations (object)
+- amazonEu (AmazonCompanyAuthorization)
+- amazonUs (AmazonCompanyAuthorization)
+- shopify (ShopifyCompanyAuthorization)
+
 ## CompanyDef (object)
 
 - id: 5 (number, required) - Internal company ID
@@ -805,6 +819,7 @@ Update existing seller order data based on Marketplace Order ID.
     - HU
     - PL
     - UK
+- authorizationKeys (CompanyAuthorizations)
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
 - lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
@@ -1037,6 +1052,10 @@ Update existing seller order data based on Marketplace Order ID.
 - carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
 - timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
 
+## CustomDataDef (object)
+- *key* (string)
+- *key* (number)
+
 ## CommonDataDef (object)
 
 - parentChild (enum[string], required)
@@ -1072,7 +1091,7 @@ Update existing seller order data based on Marketplace Order ID.
 - taxCode (string, optional) - identify tax code like VAT21, etc.
 - productUrl: `https://www.sex-shop.cz/access18/cottelli-rybarka-sitovane-saty-s-l-d3073.htm?hrk=QPOCJKFGLDS` (string, nullable) - Reference to seller product page
 - imgUrls (array[string])
-- customData: `{"VAT":"21"}` (string, nullable) - keeps custom data in key/value format. Typically usefull for data which do not have standard field in DB but are important for given product like varies contact lenses sizes, water content, etc.
+- customData (CustomDataDef, nullable) - keeps custom data in key/value format. Typically usefull for data which do not have standard field in DB but are important for given product like varies contact lenses sizes, water content, etc.
 - origData: `{"CODE":"2014800000","PRICE":"312.4","VAT":"21","DELIVERY_DATE":"0"}` (string, nullable) - keeps custom data in key/value format
 
 ## LocalizedDataDef (object)
