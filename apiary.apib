@@ -822,8 +822,8 @@ Update existing seller order data based on Marketplace Order ID.
 - authorizationKeys (CompanyAuthorizations)
 - email: `joe.doe@example.com` (string, optional) - Contact person e-mail.
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
-- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- lastChangedOn: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## UserDef (object)
 
@@ -849,8 +849,8 @@ Update existing seller order data based on Marketplace Order ID.
 - password: `aXrd&6GB78s` (string, required) - User password.
 - accessRights (RoleDef, required) - Access rights
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
-- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- lastChangedOn: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## RoleDef (object)
 
@@ -901,8 +901,8 @@ Update existing seller order data based on Marketplace Order ID.
     - PL
 - enabled: true (boolean, required) - enabled
 - createdOn: `2018-01-11 05:33:14` (string, required) - Time stamp when record was created.
-- lastChangedOn: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- lastChangedOn: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## OrderDef (object)
 
@@ -968,7 +968,7 @@ Update existing seller order data based on Marketplace Order ID.
 - shippingPrice: 4.90 (number, required) - Shipping price for order
 - customer (OrderCustomerDef, required)
 - items (array[OrderItemsDef], required)
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## OrderCustomerDef (object)
 - firstName: Autopflege (string, required)
@@ -1050,7 +1050,7 @@ Update existing seller order data based on Marketplace Order ID.
 - items: 02747069305011 (array[string], required) - list of order items which shall be shipped. They all expect same shipping and tracking number.
 - carrierId: 27F0B9FC58B940FE8B469EBE3C76D2D5 (string, optional) Carrier internal package ID if known. Used by JAPO only.
 - carrierTrackingStatus: DELIVERED (string, optional) Carrier progress reporting if known. Used by JAPO only.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## CustomDataDef (object) - Dictionary of the parameters and values of the parameters
 
@@ -1144,7 +1144,7 @@ Update existing seller order data based on Marketplace Order ID.
 - Include DataDefBase
 - commonData (CommonDataDef, required) - common product data section
 - localizedData (array[LocalizedDataDef], optional) - product language specific fields. For each language translation one record.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## ProductBaseDef (object)
 
@@ -1154,9 +1154,9 @@ Update existing seller order data based on Marketplace Order ID.
 ## ProductDef (object)
 
 - Include ProductBaseDef
-- lastChanged: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- lastChanged: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquely sorted.
-- timeStamp: 636516244170000000 (string, required) - Time stamp translated into DateTime.Ticks as defined in C#.
+- timeStamp: 636516244170000000 (string) - Time stamp translated into DateTime.Ticks as defined in C#.
 
 ## InventoryAndPriceDef (object)
 
@@ -1179,9 +1179,9 @@ Update existing seller order data based on Marketplace Order ID.
 - priceRO (number, optional) - price for RO country. Implied currency RON.
 - pricePL (number, optional) - price for PL country. Implied currency PLZ.
 - priceUE (number, optional) - price for Ukraine country. Implied currency UAH.
-- lastChanged: `2018-01-15 14:46:57` (string, required) - Time stamp when record was last time modified/created.
+- lastChanged: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
 - key: 2014800000 (string, required) - unified key under which product def is uniquely sorted.
-- timeStamp: 636516244170000000 (string, required) - Transaction time stamp of last modification.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
 
 ## DataDef (object)
 
