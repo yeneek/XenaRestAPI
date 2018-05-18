@@ -114,6 +114,7 @@ Update existing company item based on its ID. If company name matches existing f
 + Request (application/json)
     + Attributes
         + companyData (CompanyDef, required)
+            + id (number, required)
             
 + Response 200 (application/json)
     + Attributes (ReturnedRestApiDataBase)
@@ -802,7 +803,7 @@ Update existing seller order data based on Marketplace Order ID.
 
 ## CompanyDef (object)
 
-- id: 5 (number, required) - Internal company ID
+- id: 5 (number) - Internal company ID
 - name: Alensa (string, required) - Display company name
 - longName: Alensa (string, required) - Full company name
 - isActive: true (boolean, required) - Indicate `true` is active and `false` is disabled
