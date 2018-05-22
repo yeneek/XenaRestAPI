@@ -353,6 +353,39 @@ Update existing product item based on SKU.
         + errorDetails: `Company or product SKU not found.`
         + productData: null
 
+## Product listing management [/v1/ProductListings/{CompanyID}]
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+
+### Get Product listings [GET /v1/ProductListings/{CompanyID}{?limit,page,fromTimeStamp}]
+Get Product for given company
+
++ Parameters
+    + CompanyID: 123 (number, required) - company ID
+    + limit: 100 (number, optional) - page reference. Min value 1 and Max value 100. Default 100.
+    + page: 1 (number, optional) - page number to start from. Default is 1.
+    + fromTimeStamp: `636516244170000000` (string, optional) - time stamp from which shall be collected data
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiDataBase)
+        + listings (array[ProductListingsDef], optional)
+
++ Response 401
+    + Headers
+
+            WWW-Authenticate: Basic realm="Xena folder"
+
++ Request
+    + Headers
+
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiDataBase)
+        + result: error
+        + errorDetails: `Company not found.`
+        + inventories: null
+
 ## Inventory and Price Management [/v1/IPM/{CompanyID}]
 Resource enables manage inventory and price for product definitions. Listed prices are have implicit currency assigned to it. Mapping for currency is as follows: US to USD, UK to GBP, DE/FR/IT/ES/SK to EUR, CS to CZK, PL to PLZ, HU to HUF, RO to RON and UE to UAH.
 
@@ -1212,3 +1245,69 @@ Update existing seller order data based on Marketplace Order ID.
 
 ## ModificationRequestDef (object)
 - companyID: 16 (number, required) - Company ID
+
+## MarketplaceCode (enum[string])
+- Unknown
+- Amazon_uk
+- Amazon_de
+- Amazon_fr
+- Amazon_it
+- Amazon_es
+- AmazonEuropeRegion
+- Amazon_ca
+- Amazon_mx
+- Amazon_us
+- AmazonNorthAmericaRegion
+- Amazon_in
+- AmazonIndiaRegion
+- Amazon_cn
+- AmazonChinaRegion
+- Amazon_jp
+- AmazonJapanRegion
+- Ebay_uk
+- Ebay_de
+- Ebay_fr
+- Ebay_it
+- Ebay_es
+- EbayEuropeRegion
+- Ebay_ca
+- Ebay_mx
+- Ebay_us
+- EbayNorthAmericaRegion
+- Ebay_in
+- EbayIndiaRegion
+- Ebay_cn
+- EbayChinaRegion
+- Ebay_jp
+- EbayJapanRegion
+- Spartoo_uk
+- Spartoo_de
+- Spartoo_fr
+- Spartoo_it
+- Spartoo_es
+- SpartooEuropeRegion
+- Spartoo_ca
+- Spartoo_mx
+- Spartoo_us
+- SpartooNorthAmericaRegion
+- Spartoo_in
+- SpartooIndiaRegion
+- Spartoo_cn
+- SpartooChinaRegion
+- Spartoo_jp
+- SpartooJapanRegion
+- CDiscount_fr
+- CDiscount_be
+- CDiscountEuropeRegion
+- Shop_de
+
+## ProductListingsDef (object)
+- Include DataDefBase
+- isListed: true (boolean)
+- errorCode: '' (string)
+- errorText: '' (string)
+- errorLink: '' (string)
+- marketplaceId: amazon_de (MarketplaceCode)
+- createdOn: `2018-01-11 05:33:14` (string) - Time stamp when record was created.
+- lastChangedOn: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
+- timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
