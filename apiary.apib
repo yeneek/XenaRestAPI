@@ -694,7 +694,7 @@ Get marketplace order details for specific marketplace order ID.
         + orderData: null
 
 ## Seller Order Management [/v1/Sellers/{CompanyID}]
-Resource enables manage Seller side order monitoring. Seller order data confirms receiving marketplace order by seller as well as track shipping and tracking number of send package.  
+Resource enables manage Seller side order monitoring. Seller order data confirms receiving marketplace order by seller as well as track shipping and tracking number of send package.
 
 + Parameters
     + CompanyID: 123 (number, required) - company ID
@@ -812,6 +812,35 @@ Update existing seller order data based on Marketplace Order ID.
     + Attributes (ReturnedRestApiDataBase)
         + result: error
         + errorDetails: `Company or seller's market order id reference not found.`
+        + sellerData: null
+
+
+## ListingMarketplaces [/v1/ListingMarketplaces/{CompanyID}]
+With this endpoint you can specify, which marketplaces seller will list products.
+
++ Parameters
+    + CompanyID: 123 (number,required) - company ID
+
+### Set marketplaces for listings [POST /v1/ListingMarketplaces/{CompanyID}]
+Set marketplaces, where products will be listed.
+
++ Request (application/json)
+    + Attributes
+        + marketplaces (array[ListingMarketplacesDef], required)
+
++ Response 200 (application/json)
+    + Attributes (ReturnedRestApiDataBase)
+        + result: ok
+
++ Request
+    + Headers
+    
+            Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l
+
++ Response 404 (application/json)
+    + Attributes (ReturnedRestApiDataBase)
+        + result: error
+        + errorDetails: `Company not found or seller order data already exists.`
         + sellerData: null
 
 # Data Structures
@@ -1311,3 +1340,7 @@ Update existing seller order data based on Marketplace Order ID.
 - createdOn: `2018-01-11 05:33:14` (string) - Time stamp when record was created.
 - lastChangedOn: `2018-01-15 14:46:57` (string) - Time stamp when record was last time modified/created.
 - timeStamp: 636516244170000000 (string) - Transaction time stamp of last modification.
+
+## ListingMarketplacesDef (object)
+- name: amazon_de (MarketplaceCode)
+- enable: true (boolean)Adde
